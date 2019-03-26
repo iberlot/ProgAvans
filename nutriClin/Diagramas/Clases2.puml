@@ -1,0 +1,123 @@
+@startuml
+class Visitas [[java:nuctriClin.Visitas]] {
+	-int numero
+	-Calendar fecha
+	-String comentarios
+	-ArrayList<Productos> productos
+	+int siguiente_numero()
+	+Visitas()
+	+Visitas(int numero, Calendar fecha, String comentarios, ArrayList<Productos> productos)
+	+String toString()
+	+int getNumero()
+	+void setNumero(int numero)
+	+Calendar getFecha()
+	+void setFecha(Calendar fecha)
+	+String getComentarios()
+	+void setComentarios(String comentarios)
+	+ArrayList<Productos> getProductos()
+	+void setProductos(ArrayList<Productos> productos)
+}
+class Pacientes [[java:nuctriClin.Pacientes]] {
+	#int documento
+	#Calendar fNacimiento
+	#String nombre
+	#String apellido
+	#String sexo
+	#int telefono
+	#boolean obraSocial
+	#ArrayList<Tratamientos> tratamientos
+	#ArrayList<Visitas> visitas
+	+Pacientes()
+	+Pacientes(int documento, Calendar fNacimiento, String nombre, String apellido, String sexo, int telefono, boolean obraSocial, ArrayList<Tratamientos> tratamientos, ArrayList<Visitas> visitas)
+	+String toString()
+	+boolean comprobar_fNac()
+	+int getDocumento()
+	+void setDocumento(int documento)
+	+Calendar getfNacimiento()
+	+void setfNacimiento(Calendar fNacimiento)
+	+String getNombre()
+	+void setNombre(String nombre)
+	+String getApellido()
+	+void setApellido(String apellido)
+	+String getSexo()
+	+void setSexo(String sexo)
+	+int getTelefono()
+	+void setTelefono(int telefono)
+	+boolean isObraSocial()
+	+void setObraSocial(boolean obraSocial)
+	+ArrayList<Tratamientos> getTratamientos()
+	+void setTratamientos(ArrayList<Tratamientos> tratamientos)
+	+ArrayList<Visitas> getVisitas()
+	+void setVisitas(ArrayList<Visitas> visitas)
+}
+class nuctriClin [[java:nuctriClin.nuctriClin]] {
+	+{static}void main(String[] args)
+}
+class Productos [[java:nuctriClin.Productos]] {
+	-int codigo
+	-String nombre
+	-float precio
+	+Productos()
+	+Productos(int codigo, String nombre, float precio)
+	+String toString()
+	+int getCodigo()
+	+void setCodigo(int codigo)
+	+String getNombre()
+	+void setNombre(String nombre)
+	+float getPrecio()
+	+void setPrecio(float precio)
+}
+class TratEsteticos [[java:nuctriClin.TratEsteticos]] {
+	-int cantidadSeciones
+	-float precioSecion
+	+TratEsteticos()
+	+TratEsteticos(int numero, String nombre)
+	+TratEsteticos(int numero, String nombre, int cantidadSeciones, float precioSecion)
+	+String toString()
+}
+class Tratamientos [[java:nuctriClin.Tratamientos]] {
+}
+Tratamientos <|-- TratEsteticos
+class Comidas [[java:nuctriClin.Comidas]] {
+}
+class TratNtucion [[java:nuctriClin.TratNtucion]] {
+	-float caloriasMaximas
+	-ArrayList<Comidas> camidasPermitidas
+	-float costo
+	+TratNtucion()
+	+TratNtucion(float caloriasMaximas, ArrayList<Comidas> camidasPermitidas, float costo)
+	+TratNtucion(int numero, String nombre, float caloriasMaximas, ArrayList<Comidas> camidasPermitidas, float costo)
+	+String toString()
+	+float getCaloriasMaximas()
+	+void setCaloriasMaximas(float caloriasMaximas)
+	+ArrayList<Comidas> getCamidasPermitidas()
+	+void setCamidasPermitidas(ArrayList<Comidas> camidasPermitidas)
+	+float getCosto()
+	+void setCosto(float costo)
+}
+class Tratamientos [[java:nuctriClin.Tratamientos]] {
+}
+Tratamientos <|-- TratNtucion
+abstract class Tratamientos [[java:nuctriClin.Tratamientos]] {
+	#int numero
+	#String nombre
+	+Tratamientos()
+	+Tratamientos(int numero, String nombre)
+	+String toString()
+	+int getNumero()
+	+void setNumero(int numero)
+	+String getNombre()
+	+void setNombre(String nombre)
+}
+class Principal [[java:nuctriClin.Principal]] {
+	-ArrayList<Pacientes> pacientes
+	~{static}void imprimirMenu()
+	~{static}void inicializar()
+}
+
+
+TratNtucion "1" o-- "*" Comidas
+Pacientes "1" o-- "*" Tratamientos
+Pacientes "1" o-- "*" Visitas
+Visitas "1" o-- "*" Productos
+@enduml

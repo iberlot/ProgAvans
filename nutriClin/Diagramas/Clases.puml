@@ -1,0 +1,59 @@
+@startuml
+
+class Pacientes {
+# int documento
+# Calendar fNacimiento
+# String nombre
+# String apellido
+# String sexo
+# int telefono
+# boolean obraSocial
+# ArrayList <Tratamientos> tratamientos
+# ArrayList <Visitas> visitas
+
++ boolean comprobar_fNac()
+}
+
+class Visitas {
+- int numero
+- Calendar fecha
+- String comentarios
+
+- ArrayList <Productos> productos
+
+- int siguiente_numero()
+}
+
+abstract class Tratamientos {
+# int numero
+# String nombre
+- ArrayList <Productos> productos
+}
+
+class TratNtucion extends Tratamientos {
+- float caloriasMaximas
+- Array <Comidas> camidasPermitidas
+- float costo
+}
+
+class TratEsteticos extends Tratamientos {
+- int cantidadSeciones
+- float precioSecion
+}
+
+class Comidas {
+}
+
+class Productos {
+- int codigo
+- String nombre
+- float precio
+}
+
+
+TratNtucion "1" o-- "*" Comidas
+Pacientes "1" o-- "*" Tratamientos
+Pacientes "1" o-- "*" Visitas
+Visitas "1" o-- "*" Productos
+
+@enduml
