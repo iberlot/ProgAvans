@@ -147,7 +147,7 @@ public class Principal {
 
 	}
 
-	private void alta_visita() {
+	private void alta_visita(int idexPaciente) throws Exception {
 		String comentarios = Funciones.pedirString("Ingrese los comentarios de la visita: ");
 
 		ArrayList<Productos> productosV = new ArrayList<Productos>();
@@ -171,12 +171,27 @@ public class Principal {
 				}
 			} while (respuesta != 99);
 		}
-		tratamientos.add(new TratNutricion(tratamientos.size(), nombre, calorias, comidasP, precio));
+		Calendar fecha;
 
-		cargar_archivo((TratNutricion) tratamientos.get(tratamientos.size() - 1));
-		for (int i = 0; i < comidasP.size(); i++) {
-			cargar_archivo((TratNutricion) tratamientos.get(tratamientos.size() - 1), comidasP.get(i));
+		if (Funciones.pedirBooleano("La visita se realizo hoy? s/n", "s", "n")) {
+			fecha = Calendar.getInstance();
+		} else {
+			fecha = Funciones.pedirFecha("Cuando se realizo la visita");
 		}
+
+		visitas.add(new Visitas(visitas.size(), fecha, comentarios, productosV));
+
+		cargar_archivo(visitas.get(visitas.size() - 1));
+
+		for (int i = 0; i < productosV.size(); i++) {
+			cargar_archivo(visitas.get(visitas.size() - 1), productosV.get(i));
+		}
+
+		cargar_archivo(visitas.get(visitas.size() - 1), pacientes.get(idexPaciente));
+
+		pacientes.get(idexPaciente).getVisitas().add(visitas.get(visitas.size() - 1));
+
+		m_abm_visitas();
 	}
 
 	private void m_abm_comidas() throws Exception {
