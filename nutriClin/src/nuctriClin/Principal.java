@@ -33,15 +33,42 @@ import funciones.Fechas;
 import funciones.Funciones;
 
 /**
- * @author IVANB
+ * @author iberlot <@> ivanberlot@gmail.com
  *
  */
 public class Principal {
 
+	/**
+	 * Listados de los pacientes que hay en el sistema.
+	 * 
+	 * @var ArrayList<Pacientes> pacientes
+	 */
 	private ArrayList<Pacientes> pacientes = new ArrayList<Pacientes>();
+
+	/**
+	 * Listados de los tratamientos que hay en el sistema.
+	 * 
+	 * @var ArrayList<Tratamientos> tratamientos
+	 */
 	private ArrayList<Tratamientos> tratamientos = new ArrayList<Tratamientos>();
+
+	/**
+	 * Listados de los productos que hay en el sistema.
+	 * 
+	 * @var ArrayList<Productos> productos
+	 */
 	private ArrayList<Productos> productos = new ArrayList<Productos>();
+	/**
+	 * Listados de las comidas que hay en el sistema.
+	 * 
+	 * @var ArrayList<Comidas> comidas
+	 */
 	private ArrayList<Comidas> comidas = new ArrayList<Comidas>();
+	/**
+	 * Listados de las visitas que hay en el sistema.
+	 * 
+	 * @var ArrayList<Visitas> visitas
+	 */
 	private ArrayList<Visitas> visitas = new ArrayList<Visitas>();
 
 	/**
@@ -109,6 +136,11 @@ public class Principal {
 
 	}
 
+	/**
+	 * Muestra el menu relacionado al ABM de visitas
+	 * 
+	 * @throws Exception
+	 */
 	private void m_abm_visitas() throws Exception {
 		System.out.println("ABM de visitas");
 		System.out.println("1 - Nueva visita");
@@ -119,7 +151,10 @@ public class Principal {
 
 		switch (respuesta) {
 		case 1:
-			alta_visita();
+			if (Funciones.pedirBooleano("Desea buscar a la persona asociada a la nueva visita? s/n", "s", "n")) {
+				m_buscar_pacientes();
+			}
+			alta_visita(Funciones.pedirEnteroPositivo("Ingrese el codigo de paciente"));
 			break;
 
 		case 2:
@@ -195,6 +230,10 @@ public class Principal {
 	}
 
 	private void m_abm_comidas() throws Exception {
+
+		@SuppressWarnings("resource")
+		Scanner stdin = new Scanner(System.in);
+
 		System.out.println("ABM de comidas");
 		System.out.println("1 - Altas de comida");
 		System.out.println("2 - Listado de comidas");
@@ -209,6 +248,11 @@ public class Principal {
 
 		case 2:
 			listar_comidas();
+
+			System.out.println("Precione una tecla para continuar...");
+			stdin.nextLine();
+			m_abm_comidas();
+
 			break;
 
 		case 66:
@@ -218,8 +262,6 @@ public class Principal {
 		default:
 			m_abm_comidas();
 		}
-		@SuppressWarnings("resource")
-		Scanner stdin = new Scanner(System.in);
 
 		System.out.println("Precione una tecla para continuar...");
 		stdin.nextLine();
@@ -227,15 +269,37 @@ public class Principal {
 
 	}
 
+	/**
+	 * Si hay comidas cargadas en el ArrayList comidas muestra un listado de las
+	 * mismas permitiendo seleccionar una para ver su receta. En caso de no haber
+	 * comidas cargadas mustra un mensaje avisano que no las hay.
+	 */
 	private void listar_comidas() {
-		// TODO Auto-generated method stub
+		if (comidas.isEmpty() == true) {
+			System.out.println("No hay comidas registradas.");
+		} else {
+			System.out.printf("%-5s%-15s%-40s\n", "ID", "Nombre", "Calorias");
 
+			for (int i = 0; i < comidas.size(); i++) {
+				System.out.printf("%-5s%-15s%-40s\n", i, comidas.get(i).getNombre(), comidas.get(i).getCalorias());
+			}
+
+			int idBuscCom = Funciones.pedirEnteroPositivo("Ingrese el id para ver la receta o 66 para continuar");
+			if (idBuscCom != 66) {
+				System.out.println(comidas.get(idBuscCom));
+			}
+
+		}
 	}
 
+	/**
+	 * 
+	 * @throws IOException
+	 */
 	private void alta_comida() throws IOException {
 		if (Funciones.pedirBooleano("Decea dar de alta una nueva comida? s/n", "s", "n") == true) {
 			comidas.add(new Comidas(comidas.size(), Funciones.pedirString("Nombre de la comida"),
-					Funciones.pedirString("Ingrese la receeta"),
+					Funciones.pedirString("Ingrese la receta"),
 					Funciones.pedirFloat("Ingrese la cantidad de calorias")));
 
 			cargar_archivo(comidas.get(comidas.size() - 1));
@@ -294,6 +358,7 @@ public class Principal {
 		System.out.println("ABM de tratamientos");
 		System.out.println("1 - Altas de tratamientos");
 		System.out.println("2 - Listado de tratamientos");
+		System.out.println("3 - Cantidad de tratamientos esteticos");
 		System.out.println("66 - Menu anterior");
 
 		int respuesta = Funciones.pedirEnteroPositivo("");
@@ -301,10 +366,15 @@ public class Principal {
 		switch (respuesta) {
 		case 1:
 			alta_tratamientos();
+			m_abm_tratamientos();
+			break;
+
+		case 2:
+			listar_tratamientos();
 			break;
 
 		case 3:
-			m_listar_tratamientos();
+			System.out.println("Hay un total de " + TratEsteticos.getCantTrarEst() + " tratamientos esteticos");
 			break;
 
 		case 66:
@@ -323,8 +393,26 @@ public class Principal {
 
 	}
 
-	private void m_listar_tratamientos() {
-		// TODO Auto-generated method stub
+	/**
+	 * Comprueba de que haya tratamientos cargados, si no lo hay pregunta si desea
+	 * dar de alta uno nuevo. Si los hay muestra un listado con el id y el nombre.
+	 * 
+	 * FIXME creo que deberia mostrar tambien el tipo o mostrar primero uno y luego
+	 * el otro.
+	 * 
+	 * @throws Exception
+	 */
+	private void listar_tratamientos() throws Exception {
+		if (tratamientos.isEmpty() == true) {
+			System.out.println("No hay ningun tratamiento cargado.");
+			if (Funciones.pedirBooleano("Desea dar de alta un nuevo tratamiento? s/n", "s", "n") == true) {
+				alta_tratamientos();
+			}
+		}
+
+		for (int i = 0; i < tratamientos.size(); i++) {
+			System.out.println(i + " - " + tratamientos.get(i).getNombre());
+		}
 
 	}
 
@@ -356,6 +444,7 @@ public class Principal {
 
 		case 3:
 			m_buscar_pacientes();
+			m_abm_pacientes();
 			break;
 
 		case 66:
@@ -436,15 +525,15 @@ public class Principal {
 			m_abm_pacientes();
 			break;
 
-		default:
-			m_listar_pacientes();
+//		default:
+//			m_listar_pacientes();
 		}
 		@SuppressWarnings("resource")
 		Scanner stdin = new Scanner(System.in);
 
 		System.out.println("Precione una tecla para continuar...");
 		stdin.nextLine();
-		m_listar_pacientes();
+//		m_listar_pacientes();
 
 	}
 
@@ -484,6 +573,7 @@ public class Principal {
 		switch (respuesta) {
 		case 1:
 			m_buscar_pacientes();
+			m_listar_pacientes();
 			break;
 
 		case 2:
@@ -566,11 +656,13 @@ public class Principal {
 						Funciones.pedirEnteroPositivo("Ingrese la cantidad de seciones de las que constara: "),
 						Funciones.pedirFloat("Ingrese el precio por secion: ")));
 
+				TratEsteticos.aumentarCantTrarEst();
+
 				cargar_archivo((TratEsteticos) tratamientos.get(tratamientos.size() - 1));
 
 			} else {
 				String nombre = Funciones.pedirString("Ingrese el nombre del nuevo tratamiento: ");
-				float precio = Funciones.pedirFloat("Ingrese el precio por secion: ");
+				float precio = Funciones.pedirFloat("Ingrese el precio: ");
 				float calorias = Funciones.pedirFloat("Ingrese la cantidad maxima de calorias: ");
 
 				ArrayList<Comidas> comidasP = new ArrayList<Comidas>();
@@ -585,7 +677,7 @@ public class Principal {
 						}
 					}
 					respuesta = Funciones.pedirEnteroPositivo("99 - para continuar");
-					if (respuesta > (comidas.size() - 1)) {
+					if (respuesta != 99 && respuesta > (comidas.size() - 1)) {
 						System.out.println("El valor ingresado no corresponde a un menu valido");
 					} else {
 						if (respuesta != 99) {
@@ -601,7 +693,6 @@ public class Principal {
 				}
 			}
 		}
-		m_abm_tratamientos();
 	}
 
 	private void listarComidas() {
@@ -728,12 +819,74 @@ public class Principal {
 					datos[2], datos[3], datos[4], Long.parseLong(datos[5]), Boolean.parseBoolean(datos[6])));
 		}
 
-//		ArrayList<String[]> prods = funciones.Archivos.traeLineasParceadas("Datos/Productos", "|");
-//
-//		for (String[] datos : prods) {
-//			pacientes.add(new Pacientes(Integer.parseInt(datos[0]), Fechas.stringToCalendar(datos[1], "dd/MM/yyyy"),
-//					datos[2], datos[3], datos[4], Long.parseLong(datos[5]), Boolean.parseBoolean(datos[6])));
-//		}
+		ArrayList<String[]> produc = funciones.Archivos.traeLineasParceadas("Datos/Productos", "|");
+
+		for (String[] datos : produc) {
+			productos.add(new Productos(Integer.parseInt(datos[0]), datos[1], Float.parseFloat(datos[2])));
+		}
+
+		ArrayList<String[]> visitaz = funciones.Archivos.traeLineasParceadas("Datos/Visitas", "|");
+
+		for (String[] datos : visitaz) {
+			visitas.add(
+					new Visitas(Integer.parseInt(datos[0]), Fechas.stringToCalendar(datos[1], "dd/MM/yyyy"), datos[2]));
+		}
+
+		ArrayList<String[]> productoz = funciones.Archivos.traeLineasParceadas("Datos/ProductosXVisitas", "|");
+
+		for (String[] datos : productoz) {
+			visitas.get(Integer.parseInt(datos[0])).getProductos().add(productos.get(Integer.parseInt(datos[1])));
+		}
+
+		ArrayList<String[]> PacientesXVisitas = funciones.Archivos.traeLineasParceadas("Datos/PacientesXVisitas", "|");
+
+		for (String[] datos : PacientesXVisitas) {
+			pacientes.get(Integer.parseInt(datos[0])).getVisitas().add(visitas.get(Integer.parseInt(datos[1])));
+		}
+
+		ArrayList<String[]> comidaz = funciones.Archivos.traeLineasParceadas("Datos/Comidas", "|");
+
+		for (String[] datos : comidaz) {
+			comidas.add(new Comidas(Integer.parseInt(datos[0]), datos[1], datos[2], Float.parseFloat(datos[3])));
+		}
+
+		ArrayList<String[]> nutri = funciones.Archivos.traeLineasParceadas("Datos/TratNutricion", "|");
+
+		for (String[] datos : nutri) {
+//			tratamientos.add(new TratNutricion(Integer.parseInt(datos[0]), datos[1], Float.parseFloat(datos[2]),
+
+			tratamientos.add(Integer.parseInt(datos[0]), new TratNutricion(Integer.parseInt(datos[0]), datos[1],
+					Float.parseFloat(datos[2]), Float.parseFloat(datos[3])));
+		}
+
+		ArrayList<String[]> ComidasXTratamiento = funciones.Archivos.traeLineasParceadas("Datos/ComidasXTratamiento",
+				"|");
+
+		for (String[] datos : ComidasXTratamiento) {
+			System.out.println(tratamientos.get(Integer.parseInt(datos[0])));
+
+			((TratNutricion) tratamientos.get(Integer.parseInt(datos[0]))).getcomidasPermitidas()
+					.add(comidas.get(Integer.parseInt(datos[1])));
+		}
+
+		ArrayList<String[]> esteti = funciones.Archivos.traeLineasParceadas("Datos/TratEsteticos", "|");
+
+		for (String[] datos : esteti) {
+			tratamientos.add(Integer.parseInt(datos[0]), new TratEsteticos(Integer.parseInt(datos[0]), datos[1],
+					Integer.parseInt(datos[2]), Float.parseFloat(datos[3])));
+
+			TratEsteticos.aumentarCantTrarEst();
+		}
+
+		ArrayList<String[]> PacientesXTratamiento = funciones.Archivos
+				.traeLineasParceadas("Datos/PacientesXTratamiento", "|");
+
+		for (String[] datos : PacientesXTratamiento) {
+			pacientes.get(Integer.parseInt(datos[0])).getTratamientos()
+					.add(tratamientos.get(Integer.parseInt(datos[1])));
+
+		}
+
 	}
 
 	/**

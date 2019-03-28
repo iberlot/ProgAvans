@@ -1,7 +1,7 @@
 /**
  * @file Comidas.java
  * @author iberlot <@> ivanberlot@gmail.com
- * @todo 10 mar. 2019
+ * @since 10 mar. 2019
  * @version 0.1 - Version de inicio
  */
 
@@ -48,6 +48,17 @@ public class Comidas {
 		this.nombre = nombre;
 		this.receta = receta;
 		this.calorias = calorias;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return " Receta: \n\n " + id + " - " + nombre.toUpperCase() + "\n Calorias: " + calorias + "\n\n  " + receta
+				+ "\n";
 	}
 
 	/**

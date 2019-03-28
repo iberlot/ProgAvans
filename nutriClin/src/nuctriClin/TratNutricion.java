@@ -30,7 +30,7 @@ import java.util.ArrayList;
 public class TratNutricion extends Tratamientos {
 
 	private float caloriasMaximas;
-	private ArrayList<Comidas> camidasPermitidas;
+	private ArrayList<Comidas> comidasPermitidas;
 	private float costo;
 
 	/**
@@ -42,13 +42,13 @@ public class TratNutricion extends Tratamientos {
 
 	/**
 	 * @param caloriasMaximas
-	 * @param camidasPermitidas
+	 * @param comidasPermitidas
 	 * @param costo
 	 */
-	public TratNutricion(float caloriasMaximas, ArrayList<Comidas> camidasPermitidas, float costo) {
+	public TratNutricion(float caloriasMaximas, ArrayList<Comidas> comidasPermitidas, float costo) {
 		super();
 		this.caloriasMaximas = caloriasMaximas;
-		this.camidasPermitidas = camidasPermitidas;
+		this.comidasPermitidas = comidasPermitidas;
 		this.costo = costo;
 	}
 
@@ -56,12 +56,23 @@ public class TratNutricion extends Tratamientos {
 	 * @param numero
 	 * @param nombre
 	 */
-	public TratNutricion(int numero, String nombre, float caloriasMaximas, ArrayList<Comidas> camidasPermitidas,
+	public TratNutricion(int numero, String nombre, float caloriasMaximas, ArrayList<Comidas> comidasPermitidas,
 			float costo) {
 		super(numero, nombre);
 
 		this.caloriasMaximas = caloriasMaximas;
-		this.camidasPermitidas = camidasPermitidas;
+		this.comidasPermitidas = comidasPermitidas;
+		this.costo = costo;
+	}
+
+	/**
+	 * @param numero
+	 * @param nombre
+	 */
+	public TratNutricion(int numero, String nombre, float caloriasMaximas, float costo) {
+		super(numero, nombre);
+
+		this.caloriasMaximas = caloriasMaximas;
 		this.costo = costo;
 	}
 
@@ -73,7 +84,7 @@ public class TratNutricion extends Tratamientos {
 	@Override
 	public String toString() {
 		return "TratNutricion [numero=" + numero + ", nombre=" + nombre + "caloriasMaximas=" + caloriasMaximas
-				+ ", camidasPermitidas=" + camidasPermitidas + ", costo=" + costo + "]";
+				+ ", comidasPermitidas=" + comidasPermitidas + ", costo=" + costo + "]";
 	}
 
 	/**
@@ -91,17 +102,17 @@ public class TratNutricion extends Tratamientos {
 	}
 
 	/**
-	 * @return the camidasPermitidas
+	 * @return the comidasPermitidas
 	 */
-	public ArrayList<Comidas> getCamidasPermitidas() {
-		return camidasPermitidas;
+	public ArrayList<Comidas> getcomidasPermitidas() {
+		return comidasPermitidas;
 	}
 
 	/**
-	 * @param camidasPermitidas the camidasPermitidas to set
+	 * @param comidasPermitidas the comidasPermitidas to set
 	 */
-	public void setCamidasPermitidas(ArrayList<Comidas> camidasPermitidas) {
-		this.camidasPermitidas = camidasPermitidas;
+	public void setcomidasPermitidas(ArrayList<Comidas> comidasPermitidas) {
+		this.comidasPermitidas = comidasPermitidas;
 	}
 
 	/**

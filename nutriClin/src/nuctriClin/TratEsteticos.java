@@ -30,6 +30,8 @@ public class TratEsteticos extends Tratamientos {
 	private int cantidadSeciones;
 	private float precioSecion;
 
+	private static int cantTrarEst = 0;
+
 	public TratEsteticos() {
 		// TODO Auto-generated constructor stub
 	}
@@ -99,4 +101,24 @@ public class TratEsteticos extends Tratamientos {
 		this.precioSecion = precioSecion;
 	}
 
+	/**
+	 * @return El valor de cantTrarEst
+	 */
+	public static int getCantTrarEst() {
+		return cantTrarEst;
+	}
+
+	/**
+	 * @param cantTrarEst para cargar en cantTrarEst
+	 */
+	public static void setCantTrarEst(int cantTrarEst) {
+		TratEsteticos.cantTrarEst = cantTrarEst;
+	}
+
+	/**
+	 * @param cantTrarEst para cargar en cantTrarEst
+	 */
+	public static void aumentarCantTrarEst() {
+		TratEsteticos.cantTrarEst++;
+	}
 }

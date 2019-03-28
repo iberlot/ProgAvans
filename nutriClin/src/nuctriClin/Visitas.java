@@ -63,6 +63,13 @@ public final class Visitas {
 		this.productos = productos;
 	}
 
+	public Visitas(int numero, Calendar fecha, String comentarios) {
+
+		this.numero = numero;
+		this.fecha = fecha;
+		this.comentarios = comentarios;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

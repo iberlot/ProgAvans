@@ -32,6 +32,9 @@ import funciones.Fechas;
  *
  */
 public class Pacientes implements ICalculable {
+	/**
+	 * 
+	 */
 	protected int documento;
 	protected Calendar fNacimiento;
 	protected String nombre;
