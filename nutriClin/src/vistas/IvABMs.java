@@ -19,17 +19,38 @@
  *
  */
 
-package nuctriClin;
+package vistas;
 
 /**
- * @author IVANB
+ * Necesarios basicos para las vistas de un abm
+ * 
+ * @file IABMs.java
+ * @author iberlot <@> ivanberlot@gmail.com
+ * @since 20 mar. 2019
+ * @version 0.1 - Version de inicio
  *
  */
-public interface IABMs {
+public interface IvABMs {
+	
+	public void menu();
 
-	public boolean alta();
+	public void v_alta();
 
-	public boolean baja();
+	public void v_baja();
 
-	public boolean modificacion();
+	public void v_modificacion();
+
+	public void m_alta();
+
+	public void m_baja();
+
+	public void m_modificacion();
+
+	public void v_buscar();
+
+	public void m_buscar();
+
+	public void v_listar();
+
+	public boid m_listar();
 }

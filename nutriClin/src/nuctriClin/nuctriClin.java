@@ -1,7 +1,7 @@
 /**
  * @file nuctriClin.java
  * @author iberlot <@> ivanberlot@gmail.com
- * @todo 10 mar. 2019
+ * @since 10 mar. 2019
  * @version 0.1 - Version de inicio
  */
 
@@ -21,9 +21,15 @@
 
 package nuctriClin;
 
+import vistas.Menus;
+
 /**
- * @author IVANB
- *
+ * Archivo en inicio del programa.
+ * 
+ * @file nuctriClin.java
+ * @author iberlot <@> ivanberlot@gmail.com
+ * @since 10 mar. 2019
+ * @version 0.1 - Version de inicio
  */
 public class nuctriClin {
 
@@ -32,9 +38,7 @@ public class nuctriClin {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		Principal base = new Principal();
-		base.inicializar();
-		base.imprimirMenu();
+		Menus.imprimirMenu();
 	}
 
 }

@@ -19,7 +19,7 @@
  *
  */
 
-package nuctriClin;
+package modelos;
 
 import java.text.ParseException;
 import java.util.ArrayList;

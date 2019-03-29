@@ -1,4 +1,4 @@
-package nuctriClin;
+package modelos;
 
 public interface ICalculable {
 	int DESCUENTO = 15;

@@ -19,7 +19,7 @@
  *
  */
 
-package nuctriClin;
+package modelos;
 
 /**
  * @author IVANB
