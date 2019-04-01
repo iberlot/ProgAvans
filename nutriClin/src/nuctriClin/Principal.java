@@ -24,6 +24,7 @@ package nuctriClin;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Scanner;
@@ -38,6 +39,9 @@ import funciones.Funciones;
  */
 public class Principal {
 
+	private static String[] PARAMETROS;
+
+	private static Calendar FECHAACTUAL = Calendar.getInstance();
 	/**
 	 * Listados de los pacientes que hay en el sistema.
 	 * 
@@ -89,6 +93,7 @@ public class Principal {
 		System.out.println("4 - ABM de Comidas");
 		System.out.println("5 - ABM de visita");
 		System.out.println("6 - Crear archivos");
+		System.out.println("7 - Datos al azar");
 		System.out.println("66 - SALIR");
 
 		int respuesta = Funciones.pedirEnteroPositivo("");
@@ -113,12 +118,17 @@ public class Principal {
 		case 5:
 			m_abm_visitas();
 			break;
+
 		case 6:
 			funciones.Archivos.crearArchivo("Datos/Pacientes");
 			funciones.Archivos.crearArchivo("Datos/Tratamientos");
 			funciones.Archivos.crearArchivo("Datos/Productos");
 			funciones.Archivos.crearArchivo("Datos/Comidas");
 			funciones.Archivos.crearArchivo("Datos/Visitas");
+
+		case 7:
+			m_abm_visitas();
+			break;
 
 		case 66:
 			System.exit(0);
@@ -182,7 +192,21 @@ public class Principal {
 
 	}
 
-	private void alta_visita(int idexPaciente) throws Exception {
+	private void alta_visita(int id) throws Exception {
+
+		ArrayList<Integer> idPaciente = new ArrayList<Integer>();
+		idPaciente = buscar_paciente_documento(id);
+		double pagar = 0;
+		int idexPaciente = -1;
+
+		if (!idPaciente.isEmpty()) {
+			for (Integer integer : idPaciente) {
+				idexPaciente = integer;
+			}
+		} else {
+			System.out.println("No se han encontrado pacientes con esos datos.");
+		}
+
 		String comentarios = Funciones.pedirString("Ingrese los comentarios de la visita: ");
 
 		ArrayList<Productos> productosV = new ArrayList<Productos>();
@@ -196,17 +220,18 @@ public class Principal {
 					System.out.println(i + " - " + productos.get(i).getNombre());
 				}
 				respuesta = Funciones.pedirEnteroPositivo("99 - para continuar");
-				if (respuesta > (productos.size() - 1)) {
+				if (respuesta > (productos.size() - 1) && (respuesta != 99)) {
 					System.out.println("El valor ingresado no corresponde a un producto valido");
 				} else {
 					if (respuesta != 99) {
+						pagar = pagar + productos.get(respuesta).getPrecio();
 
 						productosV.add(productos.get(respuesta));
 					}
 				}
 			} while (respuesta != 99);
 		}
-		Calendar fecha;
+		Calendar fecha = Calendar.getInstance();
 
 		if (Funciones.pedirBooleano("La visita se realizo hoy? s/n", "s", "n")) {
 			fecha = Calendar.getInstance();
@@ -214,7 +239,13 @@ public class Principal {
 			fecha = Funciones.pedirFecha("Cuando se realizo la visita");
 		}
 
-		visitas.add(new Visitas(visitas.size(), fecha, comentarios, productosV));
+		String profe = Funciones.pedirString("Quien es el profecional que atiende?");
+
+		visitas.add(new Visitas(visitas.size(), fecha, comentarios, productosV, profe));
+
+		listar_tratamientos();
+		visitas.get(visitas.size() - 1)
+				.setIdTratamiento(Funciones.pedirEnteroPositivo("Ingrese el id del tratamiento"));
 
 		cargar_archivo(visitas.get(visitas.size() - 1));
 
@@ -222,9 +253,20 @@ public class Principal {
 			cargar_archivo(visitas.get(visitas.size() - 1), productosV.get(i));
 		}
 
-		cargar_archivo(visitas.get(visitas.size() - 1), pacientes.get(idexPaciente));
+		cargar_archivo(visitas.get((visitas.size() - 1)), pacientes.get(idexPaciente));
 
 		pacientes.get(idexPaciente).getVisitas().add(visitas.get(visitas.size() - 1));
+
+		System.out.println("Debe abonar un total de: ");
+		pagar = tratamientos.get(visitas.get(visitas.size() - 1).getIdTratamiento()).calc_precio() + pagar;
+		float desc = (float) (pagar * Tratamientos.DESCUENTO / 100);
+
+		if (desc > Tratamientos.TOPE) {
+			desc = Tratamientos.TOPE;
+		}
+		NumberFormat importe = NumberFormat.getCurrencyInstance();
+		System.out.println(importe.format(pagar) + " tiene un descuento por pago en efectivo de " + importe.format(desc)
+				+ " con lo que le quedaria en " + importe.format((pagar - desc)));
 
 		m_abm_visitas();
 	}
@@ -359,6 +401,8 @@ public class Principal {
 		System.out.println("1 - Altas de tratamientos");
 		System.out.println("2 - Listado de tratamientos");
 		System.out.println("3 - Cantidad de tratamientos esteticos");
+		System.out.println("4 - Detalles de tratamientos esteticos");
+		System.out.println("5 - Buscar info por trat");
 		System.out.println("66 - Menu anterior");
 
 		int respuesta = Funciones.pedirEnteroPositivo("");
@@ -377,20 +421,97 @@ public class Principal {
 			System.out.println("Hay un total de " + TratEsteticos.getCantTrarEst() + " tratamientos esteticos");
 			break;
 
+		case 4:
+			detallar_trar_estetic();
+			break;
+
+		case 5:
+			listar_datos_trat();
+			break;
+
 		case 66:
 			imprimirMenu();
 			break;
 
-		default:
-			m_abm_tratamientos();
 		}
 		@SuppressWarnings("resource")
 		Scanner stdin = new Scanner(System.in);
 
 		System.out.println("Precione una tecla para continuar...");
 		stdin.nextLine();
-		imprimirMenu();
+		m_abm_tratamientos();
+	}
 
+	public void listar_datos_trat() {
+		for (Tratamientos trato : buscar_trat_nombre_inicio(
+				Funciones.pedirString("Intrese las primeras letras del nombre del tratamiento"), 2)) {
+			for (Pacientes pacis : buscar_pacientes_tratamiento(trato)) {
+				System.out.println(pacis.getDocumento() + " " + pacis.getApYNom());
+				System.out.println("vino los dias");
+				for (Visitas vici : pacis.getVisitas()) {
+					System.out.println(Fechas.fechaAString(vici.getFecha(), '/'));
+				}
+			}
+		}
+	}
+
+	public ArrayList<Tratamientos> buscar_trat_nombre_inicio(String nombre, int tam) {
+
+		ArrayList<Tratamientos> tratos = new ArrayList<Tratamientos>();
+
+		for (int i = 0; i < tratamientos.size(); i++) {
+			if (tratamientos.get(i).getNombre().substring(0, tam).toUpperCase()
+					.equals(nombre.substring(0, tam).toUpperCase())) {
+				tratos.add(tratamientos.get(i));
+			}
+		}
+
+		return tratos;
+	}
+
+	public ArrayList<Pacientes> buscar_pacientes_tratamiento(Tratamientos trat) {
+
+		ArrayList<Pacientes> pacos = new ArrayList<Pacientes>();
+
+		for (Pacientes paci : pacientes) {
+
+			for (Visitas visi : paci.getVisitas()) {
+				if (visi.getIdTratamiento() == trat.getNumero()) {
+					pacos.add(paci);
+				}
+			}
+		}
+
+		return pacos;
+	}
+
+	private void detallar_trar_estetic() {
+		for (Tratamientos tratamiento : tratamientos) {
+			if (tratamiento instanceof TratEsteticos) {
+
+				NumberFormat importe = NumberFormat.getCurrencyInstance();
+				// Si se desea forzar el formato español:
+				// formatoImporte = NumberFormat.getCurrencyInstance(new Locale("es","ES"));
+				System.out.printf("%-35s%-15s\n", "Tratamiento: " + tratamiento.getNombre(),
+						importe.format(tratamiento.calc_precio()));
+
+				if (tratamiento.getProductos().isEmpty() == false) {
+					System.out.println("Productos asociados");
+					for (Productos producto : tratamiento.getProductos()) {
+						System.out.printf("%-35s%-15s\n", " * " + producto.getNombre(),
+								importe.format(producto.getPrecio()));
+					}
+				}
+
+				for (Visitas visita : visitas) {
+					if (visita.getIdTratamiento() == tratamiento.getNumero()) {
+						Pacientes paci = buscar_paciente_visita(visita.getNumero());
+						System.out.printf("%-35s%-15s\n", " * " + paci.getApYNom(), paci.getSexo());
+					}
+
+				}
+			}
+		}
 	}
 
 	/**
@@ -429,7 +550,11 @@ public class Principal {
 		System.out.println("ABM de pacientes");
 		System.out.println("1 - Altas de Pacientes");
 		System.out.println("2 - Listado de Pacientes");
+		System.out.println("3 - Buscar paciente");
+		System.out.println("4 - Buscar y modificar");
 		System.out.println("66 - Menu anterior");
+
+		ArrayList<Integer> idPaciente = new ArrayList<Integer>();
 
 		int respuesta = Funciones.pedirEnteroPositivo("");
 
@@ -444,7 +569,41 @@ public class Principal {
 
 		case 3:
 			m_buscar_pacientes();
-			m_abm_pacientes();
+			break;
+
+		case 4:
+			idPaciente = buscar_pacientes_nombreYApellido(
+					Funciones.pedirString("Ingrese el nombre y apellido a buscar."));
+
+			if (idPaciente.isEmpty()) {
+				System.out.println("No se han encontrado pacientes con esos datos.");
+
+			} else {
+
+				for (Integer integer : idPaciente) {
+					System.out.println(pacientes.get(integer));
+
+					int anos = FECHAACTUAL.get(Calendar.YEAR)
+							- pacientes.get(integer).getfNacimiento().get(Calendar.YEAR);
+
+					System.out.println(("Su edad es de " + ((FECHAACTUAL.get(Calendar.MONTH)
+							- pacientes.get(integer).getfNacimiento().get(Calendar.MONTH)) < 0 ? (anos) : (anos + 1))));
+
+					if (Funciones.pedirBooleano("Desea cambiar su estado de obra social? s/n", "s", "n") == true) {
+						if (pacientes.get(integer).isObraSocial() == true) {
+							pacientes.get(integer).setObraSocial(false);
+						} else {
+							pacientes.get(integer).setObraSocial(true);
+						}
+					}
+
+					if (Funciones.pedirBooleano("Desea cambiar su telefono de contacto? s/n", "s", "n") == true) {
+						pacientes.get(integer)
+								.setTelefono(Funciones.pedirLong("Ingrese el nuevo numero de telefono de contacto"));
+					}
+				}
+			}
+
 			break;
 
 		case 66:
@@ -459,7 +618,7 @@ public class Principal {
 
 		System.out.println("Precione una tecla para continuar...");
 		stdin.nextLine();
-		imprimirMenu();
+		m_abm_pacientes();
 
 	}
 
@@ -566,6 +725,7 @@ public class Principal {
 		System.out.println("Que desea hacer?");
 		System.out.println("1 - Buscar un paciente");
 		System.out.println("2 - Ver informacion de un paciente");
+		System.out.println("3 - Ver pacientes que hayan venido el mes pasado");
 		System.out.println("66 - Menu anterior");
 
 		int respuesta = Funciones.pedirEnteroPositivo("");
@@ -578,6 +738,9 @@ public class Principal {
 
 		case 2:
 			ver_paciente();
+			break;
+		case 3:
+			ver_paciente_mes_pasado(false);
 			break;
 
 		case 66:
@@ -594,6 +757,31 @@ public class Principal {
 		stdin.nextLine();
 		listar_pacientes();
 
+	}
+
+	private void ver_paciente_mes_pasado(boolean os) {
+
+		System.out.printf("%-5s%-15s%-40s\n", "ID", "DNI", "Apellido y Nombre");
+		int cant = 0;
+		int mes = ((FECHAACTUAL.get(Calendar.MONTH) == 11) ? 0 : (FECHAACTUAL.get(Calendar.MONTH) - 1));
+
+		for (int i = 0; i < pacientes.size(); i++) {
+			for (int f = 0; f < pacientes.get(i).getVisitas().size(); f++) {
+				if ((pacientes.get(i).isObraSocial() == os)
+						&& (pacientes.get(i).getVisitas().get(f).getFecha().get(Calendar.MONTH) == mes)) {
+					System.out.printf("%-5s%-15s%-40s\n", i, pacientes.get(i).getDocumento(),
+							pacientes.get(i).getApellido() + ", " + pacientes.get(i).getNombre());
+					cant++;
+				}
+			}
+		}
+
+		if (cant > 0) {
+			System.out.println("Un total de " + cant + " paciente sin OS vinieron el mes pasado.");
+		} else {
+			System.out.println("\n" + "No hubo pacientes sin OS que vinieran el mes pasado.");
+
+		}
 	}
 
 	/**
@@ -692,6 +880,31 @@ public class Principal {
 					cargar_archivo((TratNutricion) tratamientos.get(tratamientos.size() - 1), comidasP.get(i));
 				}
 			}
+
+			if (Funciones.pedirBooleano("El tratamiento tiene productos asociados? s/n", "s", "n") == true) {
+
+				System.out.println("Seleccione los productos asociasdos: ");
+
+				int respuesta;
+				do {
+					for (int i = 0; i < productos.size(); i++) {
+						if (!tratamientos.get(tratamientos.size() - 1).getProductos().contains(productos.get(i))) {
+							System.out.println(i + " - " + productos.get(i).getNombre());
+						}
+					}
+					respuesta = Funciones.pedirEnteroPositivo("99 - para continuar");
+					if (respuesta != 99 && respuesta > (productos.size() - 1)) {
+						System.out.println("El valor ingresado no corresponde a un menu valido");
+					} else {
+						if (respuesta != 99) {
+							tratamientos.get(tratamientos.size() - 1).getProductos().add(productos.get(respuesta));
+
+							cargar_archivo(tratamientos.get(tratamientos.size() - 1), productos.get(respuesta));
+
+						}
+					}
+				} while (respuesta != 99);
+			}
 		}
 	}
 
@@ -739,6 +952,85 @@ public class Principal {
 	}
 
 	/**
+	 * Recorre la lista de comidas para verificar si existe o no un numero de
+	 * identificacion. En caso de existir retorna el indice de la lista.
+	 * 
+	 * @param id Numero de documeto a buscar
+	 * @return una lista con los numeros de id de los pacientes
+	 */
+	public ArrayList<Integer> buscar_comida_id(int id) {
+		ArrayList<Integer> idComidas = new ArrayList<Integer>();
+
+		for (int i = 0; i < comidas.size(); i++) {
+
+			if (comidas.get(i).getId() == id) {
+				idComidas.add(i);
+			}
+		}
+		return idComidas;
+	}
+
+	/**
+	 * Recorre la lista de tratamientos para verificar si existe o no un numero de
+	 * identificacion. En caso de existir retorna el indice de la lista.
+	 * 
+	 * @param id Numero de tratamiento a buscar
+	 * @return int con el numero de index
+	 */
+	public int buscar_tratamiento(int id) {
+		int index = -1;
+		for (int i = 0; i < tratamientos.size(); i++) {
+
+//			System.out.println(id + " <==> " + tratamientos.get(i).getNumero());
+
+			if (tratamientos.get(i).getNumero() == id) {
+				index = i;
+			}
+		}
+		return index;
+	}
+
+	/**
+	 * Recorre la lista de productos para verificar si existe o no un numero de
+	 * identificacion. En caso de existir retorna el indice de la lista.
+	 * 
+	 * @param id Numero de identificacion del producto a buscar
+	 * @return int con el numero de index
+	 */
+	public int buscar_producto(int id) {
+		int index = -1;
+		for (int i = 0; i < productos.size(); i++) {
+
+//			System.out.println(id + " <==> " + tratamientos.get(i).getNumero());
+
+			if (productos.get(i).getCodigo() == id) {
+				index = i;
+			}
+		}
+		return index;
+	}
+
+	/**
+	 * Recorre la lista de visitas para verificar si existe o no un numero de
+	 * identificacion. En caso de existir retorna el indice de la lista.
+	 * 
+	 * @param id Numero de identificacion de la visita a buscar
+	 * @return int con el numero de index
+	 */
+	public int buscar_visita(int id) {
+		int index = -1;
+		for (int i = 0; i < visitas.size(); i++) {
+
+//			System.out.println(id + " <==> " + tratamientos.get(i).getNumero());
+
+			if (visitas.get(i).getNumero() == id) {
+				index = i;
+			}
+		}
+		return index;
+	}
+
+	/**
 	 * Recorre la lista de pacientes para verificar si existe o no un numero de
 	 * documento. En caso de existir retorna el objeto.
 	 * 
@@ -756,6 +1048,28 @@ public class Principal {
 			}
 		}
 		return idPaciente;
+	}
+
+	/**
+	 * Recorre la lista de pacientes para verificar si existe o no un numero de
+	 * documento. En caso de existir retorna el index.
+	 * 
+	 * @param doc Numero de documeto a buscar
+	 * @return el index asociado.
+	 */
+	public int buscar_paciente_index_doc(int id) {
+
+		ArrayList<Integer> idPaciente = new ArrayList<Integer>();
+		idPaciente = buscar_paciente_documento(id);
+
+		int idexPaciente = -1;
+
+		if (!idPaciente.isEmpty()) {
+			for (Integer integer : idPaciente) {
+				idexPaciente = integer;
+			}
+		}
+		return idexPaciente;
 	}
 
 	/**
@@ -811,6 +1125,48 @@ public class Principal {
 
 	}
 
+	public Pacientes buscar_paciente_visita(int idVisita) {
+
+		for (int i = 0; i < pacientes.size(); i++) {
+			for (int j = 0; j < pacientes.get(i).getVisitas().size(); j++) {
+				if (pacientes.get(i).getVisitas().get(j).getNumero() == idVisita) {
+					return pacientes.get(i);
+				}
+			}
+		}
+		return null;
+
+	}
+
+	public void datos_al_azar() {
+
+		for (int f = 0; f < visitas.size(); f++) {
+
+			int indexTrat = visitas.get(f).getIdTratamiento();
+
+			if (tratamientos.get(indexTrat) instanceof TratNutricion) {
+				if (((TratNutricion) tratamientos.get(indexTrat)).getCaloriasMaximas() == Float
+						.parseFloat(PARAMETROS[0])) {
+
+					double precio = tratamientos.get(indexTrat).calc_precio();
+
+					if (visitas.get(f).getProductos().isEmpty() == false) {
+						for (Productos prod : visitas.get(f).getProductos()) {
+							precio = precio + prod.getPrecio();
+						}
+					}
+
+					if ((int) (Math.random() * 1000) < precio) {
+						System.out.printf("%-15s%-15s%-5s%-20s%-40s\n",
+								buscar_paciente_visita(visitas.get(f).getNumero()).getApYNom(),
+								Fechas.fechaAString(visitas.get(f).getFecha(), '/'), visitas.get(f).getNumero(),
+								visitas.get(f).getProfecional(), visitas.get(f).getComentarios());
+					}
+				}
+			}
+		}
+	}
+
 	void inicializar() throws Exception {
 		ArrayList<String[]> personas = funciones.Archivos.traeLineasParceadas("Datos/Pacientes", "|");
 
@@ -828,20 +1184,26 @@ public class Principal {
 		ArrayList<String[]> visitaz = funciones.Archivos.traeLineasParceadas("Datos/Visitas", "|");
 
 		for (String[] datos : visitaz) {
-			visitas.add(
-					new Visitas(Integer.parseInt(datos[0]), Fechas.stringToCalendar(datos[1], "dd/MM/yyyy"), datos[2]));
+			visitas.add(new Visitas(Integer.parseInt(datos[0]), Fechas.stringToCalendar(datos[1], "dd/MM/yyyy"),
+					datos[2], datos[3]));
+
+			visitas.get((visitas.size() - 1)).setPago(Boolean.parseBoolean(datos[4]));
+			visitas.get((visitas.size() - 1)).setIdTratamiento(Integer.parseInt(datos[5]));
+
 		}
 
 		ArrayList<String[]> productoz = funciones.Archivos.traeLineasParceadas("Datos/ProductosXVisitas", "|");
 
 		for (String[] datos : productoz) {
-			visitas.get(Integer.parseInt(datos[0])).getProductos().add(productos.get(Integer.parseInt(datos[1])));
+			visitas.get(buscar_visita(Integer.parseInt(datos[0]))).getProductos()
+					.add(productos.get(buscar_producto(Integer.parseInt(datos[1]))));
 		}
 
 		ArrayList<String[]> PacientesXVisitas = funciones.Archivos.traeLineasParceadas("Datos/PacientesXVisitas", "|");
 
 		for (String[] datos : PacientesXVisitas) {
-			pacientes.get(Integer.parseInt(datos[0])).getVisitas().add(visitas.get(Integer.parseInt(datos[1])));
+			pacientes.get(buscar_paciente_index_doc(Integer.parseInt(datos[0]))).getVisitas()
+					.add(visitas.get(buscar_visita(Integer.parseInt(datos[1]))));
 		}
 
 		ArrayList<String[]> comidaz = funciones.Archivos.traeLineasParceadas("Datos/Comidas", "|");
@@ -853,20 +1215,32 @@ public class Principal {
 		ArrayList<String[]> nutri = funciones.Archivos.traeLineasParceadas("Datos/TratNutricion", "|");
 
 		for (String[] datos : nutri) {
-//			tratamientos.add(new TratNutricion(Integer.parseInt(datos[0]), datos[1], Float.parseFloat(datos[2]),
-
-			tratamientos.add(Integer.parseInt(datos[0]), new TratNutricion(Integer.parseInt(datos[0]), datos[1],
-					Float.parseFloat(datos[2]), Float.parseFloat(datos[3])));
+			tratamientos.add(new TratNutricion(Integer.parseInt(datos[0]), datos[1], Float.parseFloat(datos[2]),
+					Float.parseFloat(datos[3])));
 		}
 
 		ArrayList<String[]> ComidasXTratamiento = funciones.Archivos.traeLineasParceadas("Datos/ComidasXTratamiento",
 				"|");
 
 		for (String[] datos : ComidasXTratamiento) {
-			System.out.println(tratamientos.get(Integer.parseInt(datos[0])));
 
-			((TratNutricion) tratamientos.get(Integer.parseInt(datos[0]))).getcomidasPermitidas()
-					.add(comidas.get(Integer.parseInt(datos[1])));
+			int indexTrat = buscar_tratamiento(Integer.parseInt(datos[0]));
+
+			if (indexTrat == -1) {
+				System.out.println("error index no encontrado");
+
+				for (int i = 0; i < tratamientos.size(); i++) {
+
+					System.out.println(i);
+					System.out.println(tratamientos.get(i));
+				}
+
+			}
+
+			for (int index : buscar_comida_id(Integer.parseInt(datos[1]))) {
+
+				((TratNutricion) tratamientos.get(indexTrat)).getcomidasPermitidas().add(comidas.get(index));
+			}
 		}
 
 		ArrayList<String[]> esteti = funciones.Archivos.traeLineasParceadas("Datos/TratEsteticos", "|");
@@ -959,12 +1333,15 @@ public class Principal {
 	 */
 	private void cargar_archivo(Visitas visita) throws IOException {
 
-		String[] info = new String[3];
+		String[] info = new String[6];
 
 		info[0] = Integer.toString(visita.getNumero());
 		info[1] = visita.getFecha().get(Calendar.DATE) + "/" + (visita.getFecha().get(Calendar.MONTH) + 1) + "/"
 				+ visita.getFecha().get(Calendar.YEAR);
 		info[2] = visita.getComentarios();
+		info[3] = visita.getProfecional();
+		info[4] = Boolean.toString(visita.isPago());
+		info[5] = Integer.toString(visita.getIdTratamiento());
 
 		File archivo = new File("Datos/Visitas");
 		Archivos.escribeCamposPipe(archivo, info);
@@ -1044,6 +1421,23 @@ public class Principal {
 	 * @param paciente
 	 * @throws IOException
 	 */
+	private void cargar_archivo(Tratamientos tratamiento, Productos producto) throws IOException {
+
+		String[] info = new String[2];
+
+		info[0] = Integer.toString(tratamiento.getNumero());
+		info[1] = Integer.toString(producto.getCodigo());
+
+		File archivo = new File("Datos/ProductosXTratamiento");
+		Archivos.escribeCamposPipe(archivo, info);
+	}
+
+	/**
+	 * Recive un paciente y lo graba parceado en el archivo de datos de estos.
+	 * 
+	 * @param paciente
+	 * @throws IOException
+	 */
 	private void cargar_archivo(TratNutricion tratamientos) throws IOException {
 
 		String[] info = new String[4];
@@ -1074,6 +1468,104 @@ public class Principal {
 
 		File archivo = new File("Datos/TratEsteticos");
 		Archivos.escribeCamposPipe(archivo, info);
+	}
+
+	/**
+	 * @return El valor de pARAMETROS
+	 */
+	public static String[] getPARAMETROS() {
+		return PARAMETROS;
+	}
+
+	/**
+	 * @param pARAMETROS para cargar en pARAMETROS
+	 */
+	public static void setPARAMETROS(String[] pARAMETROS) {
+		PARAMETROS = pARAMETROS;
+	}
+
+	/**
+	 * @return El valor de fECHAACTUAL
+	 */
+	public static Calendar getFECHAACTUAL() {
+		return FECHAACTUAL;
+	}
+
+	/**
+	 * @param fECHAACTUAL para cargar en fECHAACTUAL
+	 */
+	public static void setFECHAACTUAL(Calendar fECHAACTUAL) {
+		FECHAACTUAL = fECHAACTUAL;
+	}
+
+	/**
+	 * @return El valor de pacientes
+	 */
+	public ArrayList<Pacientes> getPacientes() {
+		return pacientes;
+	}
+
+	/**
+	 * @param pacientes para cargar en pacientes
+	 */
+	public void setPacientes(ArrayList<Pacientes> pacientes) {
+		this.pacientes = pacientes;
+	}
+
+	/**
+	 * @return El valor de tratamientos
+	 */
+	public ArrayList<Tratamientos> getTratamientos() {
+		return tratamientos;
+	}
+
+	/**
+	 * @param tratamientos para cargar en tratamientos
+	 */
+	public void setTratamientos(ArrayList<Tratamientos> tratamientos) {
+		this.tratamientos = tratamientos;
+	}
+
+	/**
+	 * @return El valor de productos
+	 */
+	public ArrayList<Productos> getProductos() {
+		return productos;
+	}
+
+	/**
+	 * @param productos para cargar en productos
+	 */
+	public void setProductos(ArrayList<Productos> productos) {
+		this.productos = productos;
+	}
+
+	/**
+	 * @return El valor de comidas
+	 */
+	public ArrayList<Comidas> getComidas() {
+		return comidas;
+	}
+
+	/**
+	 * @param comidas para cargar en comidas
+	 */
+	public void setComidas(ArrayList<Comidas> comidas) {
+		this.comidas = comidas;
+	}
+
+	/**
+	 * @return El valor de visitas
+	 */
+	public ArrayList<Visitas> getVisitas() {
+		return visitas;
+	}
+
+	/**
+	 * @param visitas para cargar en visitas
+	 */
+	public void setVisitas(ArrayList<Visitas> visitas) {
+		this.visitas = visitas;
 	}
 
 }

@@ -21,6 +21,8 @@
 
 package nuctriClin;
 
+import java.util.ArrayList;
+
 /**
  * @author IVANB
  *
@@ -28,6 +30,7 @@ package nuctriClin;
 public abstract class Tratamientos implements ICalculable {
 	protected int numero;
 	protected String nombre;
+	protected ArrayList<Productos> productos = new ArrayList<Productos>();
 
 	/**
 	 * 
@@ -82,6 +85,20 @@ public abstract class Tratamientos implements ICalculable {
 	 */
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
+	}
+
+	/**
+	 * @return El valor de productos
+	 */
+	public ArrayList<Productos> getProductos() {
+		return productos;
+	}
+
+	/**
+	 * @param productos para cargar en productos
+	 */
+	public void setProductos(ArrayList<Productos> productos) {
+		this.productos = productos;
 	}
 
 }

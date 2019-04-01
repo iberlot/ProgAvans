@@ -32,8 +32,11 @@ public final class Visitas {
 	private int numero;
 	private Calendar fecha = Calendar.getInstance();
 	private String comentarios;
+	private String profecional;
+	private boolean pago = false;
+	private int idTratamiento;
 
-	private ArrayList<Productos> productos;
+	private ArrayList<Productos> productos = new ArrayList<Productos>();
 
 	/**
 	 * @return
@@ -68,6 +71,23 @@ public final class Visitas {
 		this.numero = numero;
 		this.fecha = fecha;
 		this.comentarios = comentarios;
+	}
+
+	public Visitas(int numero, Calendar fecha, String comentarios, String profe) {
+
+		this.numero = numero;
+		this.fecha = fecha;
+		this.comentarios = comentarios;
+		this.profecional = profe;
+	}
+
+	public Visitas(int numero, Calendar fecha, String comentarios, ArrayList<Productos> productos, String profe) {
+
+		this.numero = numero;
+		this.fecha = fecha;
+		this.comentarios = comentarios;
+		this.profecional = profe;
+		this.productos = productos;
 	}
 
 	/*
@@ -137,4 +157,45 @@ public final class Visitas {
 		this.productos = productos;
 	}
 
+	/**
+	 * @return El valor de profecional
+	 */
+	public String getProfecional() {
+		return profecional;
+	}
+
+	/**
+	 * @param profecional para cargar en profecional
+	 */
+	public void setProfecional(String profecional) {
+		this.profecional = profecional;
+	}
+
+	/**
+	 * @return El valor de pago
+	 */
+	public boolean isPago() {
+		return pago;
+	}
+
+	/**
+	 * @param pago para cargar en pago
+	 */
+	public void setPago(boolean pago) {
+		this.pago = pago;
+	}
+
+	/**
+	 * @return El valor de idTratamiento
+	 */
+	public int getIdTratamiento() {
+		return idTratamiento;
+	}
+
+	/**
+	 * @param idTratamiento para cargar en idTratamiento
+	 */
+	public void setIdTratamiento(int idTratamiento) {
+		this.idTratamiento = idTratamiento;
+	}
 }

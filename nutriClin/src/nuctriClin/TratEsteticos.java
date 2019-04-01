@@ -69,8 +69,7 @@ public class TratEsteticos extends Tratamientos {
 
 	@Override
 	public double calc_precio() {
-		// TODO Auto-generated method stub
-		return 0;
+		return cantidadSeciones * precioSecion;
 	}
 
 	/**

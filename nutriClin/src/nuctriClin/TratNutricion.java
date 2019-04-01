@@ -30,7 +30,7 @@ import java.util.ArrayList;
 public class TratNutricion extends Tratamientos {
 
 	private float caloriasMaximas;
-	private ArrayList<Comidas> comidasPermitidas;
+	private ArrayList<Comidas> comidasPermitidas = new ArrayList<Comidas>();
 	private float costo;
 
 	/**

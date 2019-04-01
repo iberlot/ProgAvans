@@ -32,7 +32,9 @@ public class nuctriClin {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
+
 		Principal base = new Principal();
+		Principal.setPARAMETROS(args);
 		base.inicializar();
 		base.imprimirMenu();
 	}

@@ -259,4 +259,8 @@ public class Pacientes implements ICalculable {
 		return 0;
 	}
 
+	public String getApYNom() {
+		return apellido + ", " + nombre;
+	}
+
 }
