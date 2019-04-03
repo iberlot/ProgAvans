@@ -1,7 +1,7 @@
 /**
  * @file Principal.java
  * @author iberlot <@> ivanberlot@gmail.com
- * @todo 10 mar. 2019
+ * @since 10 mar. 2019
  * @version 0.1 - Version de inicio
  */
 
@@ -34,14 +34,31 @@ import funciones.Fechas;
 import funciones.Funciones;
 
 /**
+ * Clase principal de la aplicacion
+ * 
+ * 
+ * @file Principal.java
  * @author iberlot <@> ivanberlot@gmail.com
+ * @since 10 mar. 2019
+ * @version 0.1 - Version de inicio
  *
  */
 public class Principal {
 
+	/**
+	 * Parametro donde se guardaran los parametros pasados por programa.
+	 * 
+	 * @var String[] PARAMETROS
+	 */
 	private static String[] PARAMETROS;
 
+	/**
+	 * Parametro static con la fecha actual.
+	 * 
+	 * @var Calendar FECHAACTUAL
+	 */
 	private static Calendar FECHAACTUAL = Calendar.getInstance();
+
 	/**
 	 * Listados de los pacientes que hay en el sistema.
 	 * 
@@ -62,12 +79,14 @@ public class Principal {
 	 * @var ArrayList<Productos> productos
 	 */
 	private ArrayList<Productos> productos = new ArrayList<Productos>();
+
 	/**
 	 * Listados de las comidas que hay en el sistema.
 	 * 
 	 * @var ArrayList<Comidas> comidas
 	 */
 	private ArrayList<Comidas> comidas = new ArrayList<Comidas>();
+
 	/**
 	 * Listados de las visitas que hay en el sistema.
 	 * 
@@ -125,6 +144,12 @@ public class Principal {
 			funciones.Archivos.crearArchivo("Datos/Productos");
 			funciones.Archivos.crearArchivo("Datos/Comidas");
 			funciones.Archivos.crearArchivo("Datos/Visitas");
+			funciones.Archivos.crearArchivo("Datos/PacientesXVisitas");
+			funciones.Archivos.crearArchivo("Datos/ProductosXVisitas");
+			funciones.Archivos.crearArchivo("Datos/TratNutricion");
+			funciones.Archivos.crearArchivo("Datos/ComidasXTratamiento");
+			funciones.Archivos.crearArchivo("Datos/TratEsteticos");
+			funciones.Archivos.crearArchivo("Datos/PacientesXTratamiento");
 
 		case 7:
 			m_abm_visitas();
@@ -134,8 +159,6 @@ public class Principal {
 			System.exit(0);
 			break;
 
-		default:
-			imprimirMenu();
 		}
 		@SuppressWarnings("resource")
 		Scanner stdin = new Scanner(System.in);
@@ -151,7 +174,7 @@ public class Principal {
 	 * 
 	 * @throws Exception
 	 */
-	private void m_abm_visitas() throws Exception {
+	public void m_abm_visitas() throws Exception {
 		System.out.println("ABM de visitas");
 		System.out.println("1 - Nueva visita");
 		System.out.println("2 - Listar visitas");
@@ -175,24 +198,44 @@ public class Principal {
 			imprimirMenu();
 			break;
 
-		default:
-			m_abm_visitas();
 		}
 		@SuppressWarnings("resource")
 		Scanner stdin = new Scanner(System.in);
 
 		System.out.println("Precione una tecla para continuar...");
 		stdin.nextLine();
-		imprimirMenu();
+		m_abm_visitas();
 
 	}
 
-	private void listar_visita() {
-		// TODO Auto-generated method stub
+	/**
+	 * Muestra el listado de las visitas y el pasiente que la realizo
+	 */
+	public void listar_visita() {
+		if (visitas.isEmpty() == true) {
+			System.out.println("No hay visitas registradas.");
+		} else {
+			System.out.printf("%-5s%-15s%-40s\n", "ID", "Fecha", "Paciente");
+
+			for (Visitas visita : visitas) {
+				System.out.printf("%-5s%-15s%-40s\n", visita.getNumero(), Fechas.fechaAString(visita.getFecha(), '/'),
+						buscar_paciente_visita(visita.getNumero()).getApYNom());
+			}
+
+		}
 
 	}
 
-	private void alta_visita(int id) throws Exception {
+	/**
+	 * Busca los datos del paciente en la base y luego pregunta los datos para
+	 * cargar la visita. Al finalizar la carga en la lista y en el archivo y muestra
+	 * el importe total a pagar y el total del descuento, ademas de cuanto quedaria
+	 * el total a pagar con el descuento incluido.
+	 * 
+	 * @param id Numero de identificacion del paciente.
+	 * @throws Exception
+	 */
+	public void alta_visita(int id) throws Exception {
 
 		ArrayList<Integer> idPaciente = new ArrayList<Integer>();
 		idPaciente = buscar_paciente_documento(id);
@@ -271,7 +314,12 @@ public class Principal {
 		m_abm_visitas();
 	}
 
-	private void m_abm_comidas() throws Exception {
+	/**
+	 * Muestra el menu para las opciones relacionadas a la comida
+	 * 
+	 * @throws Exception
+	 */
+	public void m_abm_comidas() throws Exception {
 
 		@SuppressWarnings("resource")
 		Scanner stdin = new Scanner(System.in);
@@ -290,24 +338,16 @@ public class Principal {
 
 		case 2:
 			listar_comidas();
-
-			System.out.println("Precione una tecla para continuar...");
-			stdin.nextLine();
-			m_abm_comidas();
-
 			break;
 
 		case 66:
 			imprimirMenu();
 			break;
-
-		default:
-			m_abm_comidas();
 		}
 
 		System.out.println("Precione una tecla para continuar...");
 		stdin.nextLine();
-		imprimirMenu();
+		m_abm_comidas();
 
 	}
 
@@ -316,7 +356,7 @@ public class Principal {
 	 * mismas permitiendo seleccionar una para ver su receta. En caso de no haber
 	 * comidas cargadas mustra un mensaje avisano que no las hay.
 	 */
-	private void listar_comidas() {
+	public void listar_comidas() {
 		if (comidas.isEmpty() == true) {
 			System.out.println("No hay comidas registradas.");
 		} else {
@@ -335,10 +375,11 @@ public class Principal {
 	}
 
 	/**
+	 * Realiza la carga de comidas en la lista y en el archivo
 	 * 
 	 * @throws IOException
 	 */
-	private void alta_comida() throws IOException {
+	public void alta_comida() throws IOException {
 		if (Funciones.pedirBooleano("Decea dar de alta una nueva comida? s/n", "s", "n") == true) {
 			comidas.add(new Comidas(comidas.size(), Funciones.pedirString("Nombre de la comida"),
 					Funciones.pedirString("Ingrese la receta"),
@@ -348,7 +389,12 @@ public class Principal {
 		}
 	}
 
-	private void m_abm_productos() throws Exception {
+	/**
+	 * Muestra el listado de opciones para trabajar con productos
+	 * 
+	 * @throws Exception
+	 */
+	public void m_abm_productos() throws Exception {
 		System.out.println("ABM de productos");
 		System.out.println("1 - Alta de productos");
 		System.out.println("2 - Listado de Productos");
@@ -369,24 +415,40 @@ public class Principal {
 			imprimirMenu();
 			break;
 
-		default:
-			m_abm_productos();
 		}
 		@SuppressWarnings("resource")
 		Scanner stdin = new Scanner(System.in);
 
 		System.out.println("Precione una tecla para continuar...");
 		stdin.nextLine();
-		imprimirMenu();
+		m_abm_productos();
 
 	}
 
-	private void listar_productos() {
-		// TODO Auto-generated method stub
+	/**
+	 * Muestra el listado de los productos con ID, Nombre y precio.
+	 */
+	public void listar_productos() {
+		if (productos.isEmpty() == true) {
+			System.out.println("No hay productos registrados.");
+		} else {
+			System.out.printf("%-5s%-35s%-40s\n", "ID", "Nombre", "Precio");
 
+			NumberFormat importe = NumberFormat.getCurrencyInstance();
+
+			for (Productos prods : productos) {
+				System.out.printf("%-5s%-35s%-40s\n", prods.getCodigo(), prods.getNombre(),
+						importe.format(prods.getPrecio()));
+			}
+		}
 	}
 
-	private void alta_productos() throws IOException {
+	/**
+	 * Realiza la carga de productos en la lista y en el archivo
+	 * 
+	 * @throws IOException
+	 */
+	public void alta_productos() throws IOException {
 		if (Funciones.pedirBooleano("Decea dar de alta un nuevo producto? s/n", "s", "n") == true) {
 
 			productos.add(new Productos(productos.size(), Funciones.pedirString("Nombre del producto: "),
@@ -396,13 +458,18 @@ public class Principal {
 		}
 	}
 
-	private void m_abm_tratamientos() throws Exception {
+	/**
+	 * Muestra el listado de opciones para trabajar con tratamientos
+	 * 
+	 * @throws Exception
+	 */
+	public void m_abm_tratamientos() throws Exception {
 		System.out.println("ABM de tratamientos");
 		System.out.println("1 - Altas de tratamientos");
 		System.out.println("2 - Listado de tratamientos");
 		System.out.println("3 - Cantidad de tratamientos esteticos");
 		System.out.println("4 - Detalles de tratamientos esteticos");
-		System.out.println("5 - Buscar info por trat");
+		System.out.println("5 - Buscar info por tratamientos");
 		System.out.println("66 - Menu anterior");
 
 		int respuesta = Funciones.pedirEnteroPositivo("");
@@ -410,7 +477,6 @@ public class Principal {
 		switch (respuesta) {
 		case 1:
 			alta_tratamientos();
-			m_abm_tratamientos();
 			break;
 
 		case 2:
@@ -442,6 +508,19 @@ public class Principal {
 		m_abm_tratamientos();
 	}
 
+	/**
+	 * Pide el ingreso de un patron de busqueda, permite ingresar todos los
+	 * caracteres que se quieran pero utilia los dos primeros.
+	 * 
+	 * Luego llama a la funcion buscar_trat_nombre_inicio para buscar los
+	 * tratamientos que concuerden y busca los pacientes que los esten haciendo con
+	 * la funcion buscar_pacientes_tratamiento
+	 * 
+	 * Luego muestra sus datos y las fechas en las que vino.
+	 * 
+	 * @see buscar_trat_nombre_inicio
+	 * @see buscar_pacientes_tratamiento
+	 */
 	public void listar_datos_trat() {
 		for (Tratamientos trato : buscar_trat_nombre_inicio(
 				Funciones.pedirString("Intrese las primeras letras del nombre del tratamiento"), 2)) {
@@ -455,6 +534,15 @@ public class Principal {
 		}
 	}
 
+	/**
+	 * Busca un string del tamaño pasado como parametro en el principio del nombre
+	 * de los tratamientos.
+	 * 
+	 * @param nombre String a buscar
+	 * @param tam    tamaño a buscar
+	 * @return ArrayList<Tratamientos> Lista de los tratamientos que cumplen con los
+	 *         parametros.
+	 */
 	public ArrayList<Tratamientos> buscar_trat_nombre_inicio(String nombre, int tam) {
 
 		ArrayList<Tratamientos> tratos = new ArrayList<Tratamientos>();
@@ -469,6 +557,15 @@ public class Principal {
 		return tratos;
 	}
 
+	/**
+	 * Recorre los pacientes y sus visitas a ver si alguna corresponde con el
+	 * tratamiento pasado por parametro. A partir de esto arma la lista de los
+	 * pacientes que cumplen con las condiciones.
+	 * 
+	 * @param trat Tratamientos tratamiento a buscar
+	 * @return ArrayList<Pacientes> Listado de pasientes que vinieron a una visita
+	 *         del tratamiento pasado.
+	 */
 	public ArrayList<Pacientes> buscar_pacientes_tratamiento(Tratamientos trat) {
 
 		ArrayList<Pacientes> pacos = new ArrayList<Pacientes>();
@@ -485,6 +582,10 @@ public class Principal {
 		return pacos;
 	}
 
+	/**
+	 * Muestra una lista con la informacion de los tratamientos esteticos y las
+	 * visitas que tuvieron
+	 */
 	private void detallar_trar_estetic() {
 		for (Tratamientos tratamiento : tratamientos) {
 			if (tratamiento instanceof TratEsteticos) {
@@ -502,7 +603,7 @@ public class Principal {
 								importe.format(producto.getPrecio()));
 					}
 				}
-
+				System.out.println("\n");
 				for (Visitas visita : visitas) {
 					if (visita.getIdTratamiento() == tratamiento.getNumero()) {
 						Pacientes paci = buscar_paciente_visita(visita.getNumero());
@@ -525,10 +626,7 @@ public class Principal {
 	 */
 	private void listar_tratamientos() throws Exception {
 		if (tratamientos.isEmpty() == true) {
-			System.out.println("No hay ningun tratamiento cargado.");
-			if (Funciones.pedirBooleano("Desea dar de alta un nuevo tratamiento? s/n", "s", "n") == true) {
-				alta_tratamientos();
-			}
+			alta_tratamientos();
 		}
 
 		for (int i = 0; i < tratamientos.size(); i++) {
@@ -541,9 +639,6 @@ public class Principal {
 	 * Muestra por pantalla un menu de ABM de los pacientes y recoge la opcion
 	 * seleccionada para derivar a la funcion que corresponda.
 	 * 
-	 * @throws Exception
-	 */
-	/**
 	 * @throws Exception
 	 */
 	private void m_abm_pacientes() throws Exception {
@@ -609,9 +704,6 @@ public class Principal {
 		case 66:
 			imprimirMenu();
 			break;
-
-		default:
-			m_abm_pacientes();
 		}
 		@SuppressWarnings("resource")
 		Scanner stdin = new Scanner(System.in);
@@ -684,15 +776,13 @@ public class Principal {
 			m_abm_pacientes();
 			break;
 
-//		default:
-//			m_listar_pacientes();
 		}
 		@SuppressWarnings("resource")
 		Scanner stdin = new Scanner(System.in);
 
 		System.out.println("Precione una tecla para continuar...");
 		stdin.nextLine();
-//		m_listar_pacientes();
+		m_buscar_pacientes();
 
 	}
 
@@ -747,8 +837,6 @@ public class Principal {
 			m_abm_pacientes();
 			break;
 
-		default:
-			listar_pacientes();
 		}
 		@SuppressWarnings("resource")
 		Scanner stdin = new Scanner(System.in);
@@ -759,6 +847,12 @@ public class Principal {
 
 	}
 
+	/**
+	 * Cuenta los pasientes que cumplan con la condicion de obra social que hayan
+	 * venido a una visita durante el mes anterior al actual
+	 * 
+	 * @param os boolean definidor de lo obra social
+	 */
 	private void ver_paciente_mes_pasado(boolean os) {
 
 		System.out.printf("%-5s%-15s%-40s\n", "ID", "DNI", "Apellido y Nombre");
@@ -788,16 +882,13 @@ public class Principal {
 	 * Pregunta el id del paciente y muestra la infromacion de este por pantalla
 	 */
 	private void ver_paciente() {
-
 		System.out.println(pacientes.get(Funciones.pedirEnteroPositivo("Ingrese el ID del paciente")));
-
 	}
 
 	/**
 	 * Pide los datos correspondientes al paciente y los agraga a la lista de estos
 	 * 
 	 * @throws Exception
-	 * 
 	 */
 	private void alta_pacientes() throws Exception {
 
@@ -824,14 +915,13 @@ public class Principal {
 				cargar_archivo(pacientes.get(pacientes.size() - 1));
 			}
 		}
-		m_abm_pacientes();
+//		m_abm_pacientes();
 	}
 
 	/**
 	 * Pide los datos correspondientes al paciente y los agraga a la lista de estos
 	 * 
 	 * @throws Exception
-	 * 
 	 */
 	private void alta_tratamientos() throws Exception {
 
@@ -908,13 +998,22 @@ public class Principal {
 		}
 	}
 
+	/**
+	 * Genera y muestra por pantalla un listado las comidas
+	 */
 	private void listarComidas() {
 
 		for (int i = 0; i < comidas.size(); i++) {
-			System.out.println(i + " - " + comidas.get(i).getNombre());
+			System.out.println(comidas.get(i).getId() + " - " + comidas.get(i).getNombre());
 		}
 	}
 
+	/**
+	 * Genera y muestra por pantalla un listado las comidas con menos calorias que
+	 * el valor pasado por parametro
+	 * 
+	 * @param menores float tope de calorias
+	 */
 	private void listarComidas(float menores) {
 
 		for (int i = 0; i < comidas.size(); i++) {
@@ -924,6 +1023,13 @@ public class Principal {
 		}
 	}
 
+	/**
+	 * Genera y muestra por pantalla un listado las comidas con menos calorias que
+	 * el valor pasado por parametro y mayor que otro parametro.
+	 * 
+	 * @param menores float tope de calorias
+	 * @param menores float minimo de calorias
+	 */
 	private void listarComidas(float menores, float mayores) {
 		if (menores > mayores) {
 			System.out.println("El limite inferior no puede ser mayor al superios");
@@ -981,8 +1087,6 @@ public class Principal {
 		int index = -1;
 		for (int i = 0; i < tratamientos.size(); i++) {
 
-//			System.out.println(id + " <==> " + tratamientos.get(i).getNumero());
-
 			if (tratamientos.get(i).getNumero() == id) {
 				index = i;
 			}
@@ -1001,8 +1105,6 @@ public class Principal {
 		int index = -1;
 		for (int i = 0; i < productos.size(); i++) {
 
-//			System.out.println(id + " <==> " + tratamientos.get(i).getNumero());
-
 			if (productos.get(i).getCodigo() == id) {
 				index = i;
 			}
@@ -1020,8 +1122,6 @@ public class Principal {
 	public int buscar_visita(int id) {
 		int index = -1;
 		for (int i = 0; i < visitas.size(); i++) {
-
-//			System.out.println(id + " <==> " + tratamientos.get(i).getNumero());
 
 			if (visitas.get(i).getNumero() == id) {
 				index = i;
@@ -1079,7 +1179,7 @@ public class Principal {
 	 * escribir ambos.
 	 * 
 	 * @param nombreYApellido String con los nombre3s y apellidos a buscar.
-	 * @return
+	 * @return ArrayList<Integer> con los ids de pacientes
 	 */
 	private ArrayList<Integer> buscar_pacientes_nombreYApellido(String nombreYApellido) {
 
@@ -1109,7 +1209,7 @@ public class Principal {
 	 * Compara la igualdad de la fecha de nacimiento con la fecha pasada
 	 * 
 	 * @param fecha
-	 * @return
+	 * @return ArrayList<Integer> con los ids de pacientes
 	 */
 	private ArrayList<Integer> buscar_pacientes_fechaN(Calendar fecha) {
 
@@ -1125,6 +1225,12 @@ public class Principal {
 
 	}
 
+	/**
+	 * Busca el paciente asuciado a una visita pasada por parametro.
+	 * 
+	 * @param idVisita id de la visita
+	 * @return Pacientes Objeto del paciente asociado.
+	 */
 	public Pacientes buscar_paciente_visita(int idVisita) {
 
 		for (int i = 0; i < pacientes.size(); i++) {
@@ -1138,6 +1244,9 @@ public class Principal {
 
 	}
 
+	/**
+	 * 
+	 */
 	public void datos_al_azar() {
 
 		for (int f = 0; f < visitas.size(); f++) {
@@ -1167,6 +1276,11 @@ public class Principal {
 		}
 	}
 
+	/**
+	 * Recorre los archivos de datos de la aplicacion y carga las listas a utiliar.
+	 * 
+	 * @throws Exception
+	 */
 	void inicializar() throws Exception {
 		ArrayList<String[]> personas = funciones.Archivos.traeLineasParceadas("Datos/Pacientes", "|");
 
@@ -1289,9 +1403,9 @@ public class Principal {
 	}
 
 	/**
-	 * Recive un paciente y lo graba parceado en el archivo de datos de estos.
+	 * Recive un producto y lo graba parceado en el archivo de datos de estos.
 	 * 
-	 * @param paciente
+	 * @param producto Productos
 	 * @throws IOException
 	 */
 	private void cargar_archivo(Productos producto) throws IOException {
@@ -1307,9 +1421,9 @@ public class Principal {
 	}
 
 	/**
-	 * Recive un paciente y lo graba parceado en el archivo de datos de estos.
+	 * Recive una comida y lo graba parceado en el archivo de datos de estos.
 	 * 
-	 * @param paciente
+	 * @param comida Comidas
 	 * @throws IOException
 	 */
 	private void cargar_archivo(Comidas comida) throws IOException {
@@ -1326,9 +1440,9 @@ public class Principal {
 	}
 
 	/**
-	 * Recive un paciente y lo graba parceado en el archivo de datos de estos.
+	 * Recive una visita y lo graba parceado en el archivo de datos de estos.
 	 * 
-	 * @param paciente
+	 * @param visita Visitas
 	 * @throws IOException
 	 */
 	private void cargar_archivo(Visitas visita) throws IOException {
@@ -1348,9 +1462,11 @@ public class Principal {
 	}
 
 	/**
-	 * Recive un paciente y lo graba parceado en el archivo de datos de estos.
+	 * Recive un producto y una visita y lo graba parceado en el archivo de datos de
+	 * estos.
 	 * 
-	 * @param paciente
+	 * @param Visitas   visita
+	 * @param Productos producto
 	 * @throws IOException
 	 */
 	private void cargar_archivo(Visitas visita, Productos producto) throws IOException {
@@ -1365,9 +1481,11 @@ public class Principal {
 	}
 
 	/**
-	 * Recive un paciente y lo graba parceado en el archivo de datos de estos.
+	 * Recive una visita y un paciente y lo graba parceado en el archivo de datos de
+	 * estos.
 	 * 
-	 * @param paciente
+	 * @param Visitas   visita
+	 * @param Pacientes paciente
 	 * @throws IOException
 	 */
 	private void cargar_archivo(Visitas visita, Pacientes paciente) throws IOException {
@@ -1382,9 +1500,11 @@ public class Principal {
 	}
 
 	/**
-	 * Recive un paciente y lo graba parceado en el archivo de datos de estos.
+	 * Recive un paciente y un tratamiento y lo graba parceado en el archivo de
+	 * datos de estos.
 	 * 
-	 * @param paciente
+	 * @param Tratamientos tratamiento
+	 * @param Pacientes    paciente
 	 * @throws IOException
 	 */
 	private void cargar_archivo(Tratamientos tratamiento, Pacientes paciente) throws IOException {
@@ -1399,9 +1519,11 @@ public class Principal {
 	}
 
 	/**
-	 * Recive un paciente y lo graba parceado en el archivo de datos de estos.
+	 * Recive un tratamiento y una comida y lo graba parceado en el archivo de datos
+	 * de estos.
 	 * 
-	 * @param paciente
+	 * @param TratNutricion tratamiento
+	 * @param Comidas       comida
 	 * @throws IOException
 	 */
 	private void cargar_archivo(TratNutricion tratamiento, Comidas comida) throws IOException {
@@ -1416,9 +1538,11 @@ public class Principal {
 	}
 
 	/**
-	 * Recive un paciente y lo graba parceado en el archivo de datos de estos.
+	 * Recive un tratamiento y un producto y lo graba parceado en el archivo de
+	 * datos de estos.
 	 * 
-	 * @param paciente
+	 * @param Tratamientos tratamiento
+	 * @param Productos    producto
 	 * @throws IOException
 	 */
 	private void cargar_archivo(Tratamientos tratamiento, Productos producto) throws IOException {
@@ -1433,9 +1557,9 @@ public class Principal {
 	}
 
 	/**
-	 * Recive un paciente y lo graba parceado en el archivo de datos de estos.
+	 * Recive un tratamientos y lo graba parceado en el archivo de datos de estos.
 	 * 
-	 * @param paciente
+	 * @param TratNutricion tratamientos
 	 * @throws IOException
 	 */
 	private void cargar_archivo(TratNutricion tratamientos) throws IOException {
@@ -1452,9 +1576,9 @@ public class Principal {
 	}
 
 	/**
-	 * Recive un paciente y lo graba parceado en el archivo de datos de estos.
+	 * Recive un tratamientos y lo graba parceado en el archivo de datos de estos.
 	 * 
-	 * @param paciente
+	 * @param TratEsteticos tratamientos
 	 * @throws IOException
 	 */
 	private void cargar_archivo(TratEsteticos tratamientos) throws IOException {

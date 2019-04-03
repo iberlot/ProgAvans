@@ -1,59 +1,182 @@
 @startuml
 
+class nuctriClin [[java:nuctriClin.nuctriClin]] {
+	+{static}void main(String[] args)
+}
+
+interface ICalculable [[java:nuctriClin.ICalculable]] {
+	int DESCUENTO
+	int TOPE
+	double calc_precio()
+}
+
+
+class Principal {
+	-{static}String[] PARAMETROS
+	-{static}Calendar FECHAACTUAL
+	-ArrayList<Pacientes> pacientes
+	-ArrayList<Tratamientos> tratamientos
+	-ArrayList<Productos> productos
+	-ArrayList<Comidas> comidas
+	-ArrayList<Visitas> visitas
+	+void imprimirMenu()
+	+void m_abm_visitas()
+	+void listar_visita()
+	+void alta_visita(int id)
+	+void m_abm_comidas()
+	+void listar_comidas()
+	+void alta_comida()
+	+void m_abm_productos()
+	+void listar_productos()
+	+void alta_productos()
+	+void m_abm_tratamientos()
+	+void listar_datos_trat()
+	+ArrayList<Tratamientos> buscar_trat_nombre_inicio(String nombre, int tam)
+	+ArrayList<Pacientes> buscar_pacientes_tratamiento(Tratamientos trat)
+	-void detallar_trar_estetic()
+	-void listar_tratamientos()
+	-void m_abm_pacientes()
+	-void m_buscar_pacientes()
+	-void listar_pacientes()
+	-void m_listar_pacientes()
+	-void ver_paciente_mes_pasado(boolean os)
+	-void ver_paciente()
+	-void alta_pacientes()
+	-void alta_tratamientos()
+	-void listarComidas()
+	-void listarComidas(float menores)
+	-void listarComidas(float menores, float mayores)
+	+boolean existe_documento(int doc)
+	+ArrayList<Integer> buscar_comida_id(int id)
+	+int buscar_tratamiento(int id)
+	+int buscar_producto(int id)
+	+int buscar_visita(int id)
+	+ArrayList<Integer> buscar_paciente_documento(int doc)
+	+int buscar_paciente_index_doc(int id)
+	-ArrayList<Integer> buscar_pacientes_nombreYApellido(String nombreYApellido)
+	-ArrayList<Integer> buscar_pacientes_fechaN(Calendar fecha)
+	+Pacientes buscar_paciente_visita(int idVisita)
+	+void datos_al_azar()
+	+void inicializar()
+	-void cargar_archivo(Pacientes paciente)
+	-void cargar_archivo(Productos producto)
+	-void cargar_archivo(Comidas comida)
+	-void cargar_archivo(Visitas visita)
+	-void cargar_archivo(Visitas visita, Productos producto)
+	-void cargar_archivo(Visitas visita, Pacientes paciente)
+	-void cargar_archivo(Tratamientos tratamiento, Pacientes paciente)
+	-void cargar_archivo(TratNutricion tratamiento, Comidas comida)
+	-void cargar_archivo(Tratamientos tratamiento, Productos producto)
+	-void cargar_archivo(TratNutricion tratamientos)
+}
+
+
+class Visitas  {
+	-int numero
+	-Calendar fecha
+	-String comentarios
+	-String profecional
+	-boolean pago
+	-int idTratamiento
+	-ArrayList<Productos> productos
+	+int siguiente_numero()
+	+Visitas()
+	+Visitas(int numero, Calendar fecha, String comentarios)
+	+Visitas(int numero, Calendar fecha, String comentarios, String profe)
+	+Visitas(int numero, Calendar fecha, String comentarios, ArrayList<Productos> productos)
+	+Visitas(int numero, Calendar fecha, String comentarios, ArrayList<Productos> productos, String profe)
+	+String toString()
+}
 class Pacientes {
-# int documento
-# Calendar fNacimiento
-# String nombre
-# String apellido
-# String sexo
-# int telefono
-# boolean obraSocial
-# ArrayList <Tratamientos> tratamientos
-# ArrayList <Visitas> visitas
-
-+ boolean comprobar_fNac()
+	#int documento
+	#Calendar fNacimiento
+	#String nombre
+	#String apellido
+	#String sexo
+	#long telefono
+	#boolean obraSocial
+	#ArrayList<Tratamientos> tratamientos
+	#ArrayList<Visitas> visitas
+	+Pacientes()
+	+Pacientes(Con todo)
+	+String toString()
+	+boolean comprobar_fNac()
+	+double calc_precio()
+	+String getApYNom()
+}
+abstract class Tratamientos{
+	#int numero
+	#String nombre
+	#ArrayList<Productos> productos
+	+Tratamientos()
+	+Tratamientos(int numero, String nombre)
+	+String toString()
+}
+class TratEsteticos {
+	-int cantidadSeciones
+	-float precioSecion
+	-{static}int cantTrarEst
+	+TratEsteticos()
+	+TratEsteticos(int numero, String nombre)
+	+TratEsteticos(int numero, String nombre,
+	 int cantidadSeciones, float precioSecion)
+	+String toString()
+	+double calc_precio()
+	+{static}void aumentarCantTrarEst()
 }
 
-class Visitas {
-- int numero
-- Calendar fecha
-- String comentarios
-
-- ArrayList <Productos> productos
-
-- int siguiente_numero()
+class TratNutricion  {
+	-float caloriasMaximas
+	-ArrayList<Comidas> comidasPermitidas
+	-float costo
+	+TratNutricion()
+	+TratNutricion(float caloriasMaximas, ArrayList<Comidas> 
+	comidasPermitidas, float costo)
+	+TratNutricion(int numero, String nombre, float caloriasMaximas,
+	 ArrayList<Comidas> comidasPermitidas, float costo)
+	+TratNutricion(int numero, String nombre, float caloriasMaximas,
+	 float costo)
+	+String toString()
+	+double calc_precio()
 }
-
-abstract class Tratamientos {
-# int numero
-# String nombre
-- ArrayList <Productos> productos
-}
-
-class TratNtucion extends Tratamientos {
-- float caloriasMaximas
-- Array <Comidas> camidasPermitidas
-- float costo
-}
-
-class TratEsteticos extends Tratamientos {
-- int cantidadSeciones
-- float precioSecion
-}
-
 class Comidas {
+	#int id
+	#String nombre
+	#String receta
+	#float calorias
+	+Comidas()
+	+Comidas(int id, String nombre, 
+	String receta, float calorias)
+	+String toString()
 }
-
 class Productos {
-- int codigo
-- String nombre
-- float precio
+	-int codigo
+	-String nombre
+	-float precio
+	+Productos()
+	+Productos(int codigo, String nombre, float precio)
+	+String toString()
 }
 
 
-TratNtucion "1" o-- "*" Comidas
+
+
+
+
+
+Tratamientos <|-- TratEsteticos
+Tratamientos <|-- TratNutricion
+ICalculable <|.. Tratamientos
+
+TratNutricion "1" o-- "*" Comidas
 Pacientes "1" o-- "*" Tratamientos
 Pacientes "1" o-- "*" Visitas
 Visitas "1" o-- "*" Productos
+
+Principal "1" o-- "*" Pacientes
+Principal "1" o-- "*" Productos
+Principal "1" o-- "*" Comidas
+Principal "1" o-- "*" Visitas
+Principal "1" o-- "*" Tratamientos
 
 @enduml
